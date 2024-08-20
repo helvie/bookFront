@@ -1,9 +1,20 @@
-<form (ngSubmit)="onSubmit()">
-  <label for="email">Username:</label>
-  <input type="text" id="email" [(ngModel)]="user.email" name="email" required>
 
-  <label for="password">Password:</label>
-  <input type="password" id="password" [(ngModel)]="user.password" name="password" required>
-
-  <button type="submit">Login</button>
-</form>
+<div style="display: flex; justify-content: center; margin-top: 20px;">
+  <mat-card style="width: 400px; padding: 20px;">
+    <h2>Login</h2>
+    <form (ngSubmit)="onSubmit()">
+      <mat-form-field style="width: 100%;">
+        <mat-label>Username</mat-label>
+        <input matInput type="text" id="email" [(ngModel)]="user.email" name="email" required>
+      </mat-form-field>
+      <mat-form-field style="width: 100%;">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" id="password" [(ngModel)]="user.password" name="password" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Login</button>
+      <div style="margin-top: 10px;">
+        <a routerLink="/request-reset-password">Forgot your password?</a>
+      </div>
+    </form>
+  </mat-card>
+</div>
