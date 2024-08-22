@@ -1,0 +1,34 @@
+<!-- Conteneur centré avec marge en haut -->
+<div style="display: flex; justify-content: center; margin-top: 20px;">
+  
+  <!-- Carte avec padding de 20px et largeur de 400px -->
+  <mat-card style="width: 400px; padding: 20px;">
+    
+    <!-- Titre du formulaire de connexion -->
+    <h2>Connexion</h2>
+    
+    <!-- Formulaire de connexion -->
+    <form (ngSubmit)="onSubmit()">
+      
+      <!-- Champ email -->
+      <mat-form-field style="width: 100%;">
+        <mat-label>Email</mat-label>
+        <input matInput type="text" id="email" [(ngModel)]="user.email" name="email" required>
+      </mat-form-field>
+      
+      <!-- Champ mot de passe -->
+      <mat-form-field style="width: 100%;">
+        <mat-label>Mot de passe</mat-label>
+        <input matInput type="password" id="password" [(ngModel)]="user.password" name="password" required>
+      </mat-form-field>
+      
+      <!-- Bouton de soumission -->
+      <button mat-raised-button color="primary" type="submit">Se connecter</button>
+      
+      <!-- Lien pour mot de passe oublié -->
+      <div style="margin-top: 10px;">
+        <a routerLink="/auth/request-reset-password">Mot de passe oublié ?</a>
+      </div>
+    </form>
+  </mat-card>
+</div>

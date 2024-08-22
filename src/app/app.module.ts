@@ -4,37 +4,32 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './views/home/home.component';
-import { LoginComponent } from './views/login/login.component';
-import { SignupComponent } from './views/signup/signup.component';
-import { AuthInterceptor } from './services/authentication/auth.interceptor';
+import { AuthInterceptor } from './authentication/services/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
-import { ResetPasswordComponent } from './views/reset-password/reset-password.component';
-import { RequestResetPasswordComponent } from './views/request-reset-password/request-reset-password.component';
+
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    LoginComponent,
-    SignupComponent,
-    ResetPasswordComponent,
-    RequestResetPasswordComponent
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
+    AppRoutingModule, 
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
   ],
   providers: [    
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true } // Intercepteur HTTP pour l'authentification
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent] // Point d'entrée principal de l'application
 })
 export class AppModule { }

@@ -1,0 +1,38 @@
+<!-- Bouton d'icône déclenchant un menu -->
+<button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+    <mat-icon>more_vert</mat-icon>
+</button>
+
+<!-- Définition du menu déroulant -->
+<mat-menu #menu="matMenu">
+
+    <!-- Option de menu pour créer un compte, visible si non connecté -->
+    <button mat-menu-item *ngIf="!authService.isLoggedIn()" routerLink="/auth/signup">
+        <mat-icon>person_add</mat-icon>
+        <span>Créer un compte</span>
+    </button>
+
+    <!-- Option de menu pour se déconnecter, visible si connecté -->
+    <button mat-menu-item *ngIf="authService.isLoggedIn()" (click)=authService.logout()>
+        <mat-icon>logout</mat-icon>
+        <span>Se déconnecter</span>
+    </button>
+
+    <!-- Option de menu pour se connecter, visible si non connecté -->
+    <button mat-menu-item *ngIf="!authService.isLoggedIn()" routerLink="/auth/login">
+        <mat-icon>login</mat-icon>
+        <span>Se connecter</span>
+    </button>
+
+    <!-- Option de menu pour changer le mot de passe, visible si connecté -->
+    <button mat-menu-item *ngIf="authService.isLoggedIn()" routerLink="/auth/change-password">
+        <mat-icon>lock_reset</mat-icon>
+        <span>Renouveler le mot de passe</span>
+    </button>
+
+    <!-- Option de menu désactivée pour désactiver les alertes -->
+    <button mat-menu-item disabled>
+        <mat-icon>notifications_off</mat-icon>
+        <span>Disable alerts</span>
+    </button>
+</mat-menu>
