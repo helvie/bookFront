@@ -17,7 +17,11 @@ export class AuthInterceptor implements HttpInterceptor {
   // Intercepte toutes les requêtes HTTP sortantes
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Ne pas intercepter les requêtes de login et signup
-    if (request.url.endsWith('/user/login') || request.url.endsWith('/user/signup')) {
+    if (request.url.endsWith('/user/login') || 
+      request.url.endsWith('/user/signup') || 
+      request.url.endsWith('/user/forgot-password') ||
+      request.url.endsWith('/user/reset-password')
+    ) {
       return next.handle(request);
     }
 
@@ -25,7 +29,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return this.addAuthHeader(request, next).pipe(
       catchError(error => {
         // Si la réponse est 401 (non autorisé) et que ce n'est pas une demande de refresh token
-        if (error instanceof HttpErrorResponse && error.status === 401 && !request.url.endsWith('/auth/refresh-token')) {
+        if (error instanceof HttpErrorResponse && error.status === 401 && !request.url.endsWith('/user/refresh-token')) {
           return this.handle401Error(request, next); // Tente de rafraîchir le token
         }
         return throwError(() => error); // Si autre erreur, la remonter

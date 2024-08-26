@@ -7,6 +7,7 @@ import { User } from 'src/app/models/user/user';
 import { constant } from 'src/app/conf/constant';
 import { LoginCredentials } from '../models/loginCredentials';
 import { SignupCredentials } from '../models/signupCredentials';
+import { ErrorHandlerService } from './error-handler.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,30 +16,57 @@ export class AuthService {
   private baseUrl = constant.apiUrl; // URL de base pour les appels API
   private refreshTokenSubject = new BehaviorSubject<boolean>(false); // Suivi de l'état du rafraîchissement du token
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private errorHandler: ErrorHandlerService //
+    ) {}
 
 
 // ----------------------------------------------- LOGIN ---------------------------------------------
 
 
-  // Méthode de connexion
-  login(credentials: LoginCredentials): Observable<User> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+login(credentials: LoginCredentials): Observable<User> {
+  const headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-    return this.http.post<User>(`${this.baseUrl}/user/login`, credentials, { headers }).pipe(
-      tap(response => {
-        if (response.token && response.refreshToken) {
-          // Stocker les tokens dans le localStorage
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('refreshToken', response.refreshToken);
-          console.log('Token stored in localStorage:', response.token);
-        } else {
-          console.error('Token or refreshToken not found in the response');
-        }
-      }),
-      catchError(this.handleError) // Gestion des erreurs
-    );
-  }
+  return this.http.post<User>(`${this.baseUrl}/user/login`, credentials, { headers }).pipe(
+    tap(response => {
+      if (response.firstname && response.lastname) {
+        localStorage.setItem('firstname', response.firstname);
+        localStorage.setItem('lastname', response.lastname);       
+      }
+      if (response.token && response.refreshToken) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('refreshToken', response.refreshToken);
+
+        localStorage.setItem('email', response.email);
+
+        console.log('Token stored in localStorage:', response.token);
+      } else {
+        console.error('Token or refreshToken not found in the response');
+      }
+    }),
+    catchError((error: HttpErrorResponse) => {
+      console.error('Login failed', error);
+
+      // Gestion des erreurs en fonction des statuts HTTP
+      let errorMessage = 'Une erreur inattendue est survenue.';
+      if (error.status === 404) {
+        errorMessage = 'Utilisateur non trouvé.';
+      } else if (error.status === 423) {
+        errorMessage = 'Compte verrouillé. Réessayez dans 15 minutes.';
+      } else if (error.status === 401) {
+        errorMessage = 'Échec de l\'authentification. Vérifiez vos identifiants.';
+      } else if (error.error && typeof error.error === 'string') {
+        // Si le backend renvoie un message d'erreur comme une chaîne
+        errorMessage = error.error;
+      }
+
+      // Retourne une erreur sous forme d'Observable pour être capturée par l'appelant
+      return throwError(() => new Error(errorMessage));
+    })
+  );
+}
 
 
   // -------------------------------------- REQUEST RESET PASSWORD ------------------------------------
@@ -48,19 +76,34 @@ export class AuthService {
   requestResetPassword(email: string): Observable<any> {
     const body = JSON.stringify({ email });
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
-
+  
     console.log('Sending password reset request:', body);
-
-    return this.http.post(`${this.baseUrl}/auth/forgot-password`, body, { headers }).pipe(
+    console.log(`${this.baseUrl}/user/forgot-password`);
+  
+    return this.http.post(`${this.baseUrl}/user/forgot-password`, body, { headers, responseType: 'text' }).pipe(
         tap(response => {
             console.log('Received response:', response);
         }),
         catchError((error: HttpErrorResponse) => {
-            console.error('Request failed', error);
-            return throwError(() => new Error('Password reset request failed'));
+          let errorMessage = 'Une erreur inattendue est survenue.';
+  
+          console.error('Request failed', error);
+  
+          if (error.status === 404) {
+            errorMessage = 'Utilisateur non trouvé.';
+          } else if (error.status === 423) {
+            errorMessage = 'Compte verrouillé. Réessayez dans 15 minutes.';
+          } else if (error.error && typeof error.error === 'string') {
+            // Si le backend renvoie un message d'erreur sous forme de chaîne
+            errorMessage = error.error;
+          }
+  
+          return throwError(() => new Error(errorMessage));
         })
     );
   }
+  
+  
 
 
   // ---------------------------------------------- SIGNUP --------------------------------------------
@@ -68,14 +111,12 @@ export class AuthService {
 
   // Méthode d'inscription
   signup(credentials: SignupCredentials): Observable<User> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     console.log('Sending signup data:', credentials);
 
     return this.http.post<User>(`${this.baseUrl}/user/signup`, credentials, { headers }).pipe(
       tap(response => {
         if (response.token && response.refreshToken) {
-
-          // Stockage des tokens dans le localStorage
           localStorage.setItem('token', response.token);
           localStorage.setItem('refreshToken', response.refreshToken);
           console.log('Token stored in localStorage:', response.token);
@@ -83,7 +124,7 @@ export class AuthService {
           console.error('Token or refreshToken not found in the response');
         }
       }),
-      catchError(this.handleError) // Gestion des erreurs
+      catchError(this.errorHandler.handleError) // Utilisation du service ErrorHandlerService pour gérer les erreurs
     );
   }
 
@@ -100,7 +141,7 @@ export class AuthService {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     const body = JSON.stringify({ refreshToken: token });
 
-    return this.http.post<any>(`${this.baseUrl}/auth/refresh-token`, body, { headers }).pipe(
+    return this.http.post<any>(`${this.baseUrl}/user/refresh-token`, body, { headers }).pipe(
       tap(response => {
         if (response.token) {
           localStorage.setItem('token', response.token); // Stocke le nouveau token
@@ -154,17 +195,20 @@ export class AuthService {
 
 
   // ------------------------------------------- RESET PASSWORD -----------------------------------------
-
-  // Réinitialisation du mot de passe avec un token
+  
   resetPassword(newPassword: string, token: string): Observable<any> {
-    const body = JSON.stringify({ newPassword, token });
+    const body = { newPassword, token };
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
-
-    return this.http.post<any>(`${this.baseUrl}/auth/reset-password`, body, { headers }).pipe(
+  
+    return this.http.post<{ message: string }>(`${this.baseUrl}/user/reset-password`, body, { headers }).pipe(
       tap(response => {
-        console.log('Password reset successfully:', response);
+        console.log('Password reset successfully:', response.message);
       }),
-      catchError(this.handleError) 
+      catchError(error => {
+        console.error('Password reset failed:', error);
+        const errorMessage = error.error?.message || 'An unexpected error occurred';
+        return throwError(() => new Error(errorMessage));
+      })
     );
   }
   // ------------------------------------------ CHANGE PASSWORD ----------------------------------------
@@ -177,7 +221,7 @@ export class AuthService {
       'Authorization': `Bearer ${this.getToken()}` // Ajoute le token dans les headers pour l'authentification
     });
 
-    return this.http.post<any>(`${this.baseUrl}/auth/change-password`, body, { headers }).pipe(
+    return this.http.post<any>(`${this.baseUrl}/user/change-password`, body, { headers }).pipe(
       tap(response => {
         console.log('Password changed successfully:', response);
       }),

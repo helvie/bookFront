@@ -17,7 +17,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatIconModule,
     MatMenuModule,
     MatBadgeModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+
   ]
 })
 export class MaterialModule { }

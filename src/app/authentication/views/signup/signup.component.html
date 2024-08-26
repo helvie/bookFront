@@ -10,38 +10,112 @@
     <!-- Formulaire de création de compte avec FormGroup -->
     <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
       
-      <!-- Champ pour le prénom -->
-      <mat-form-field style="width: 100%;">
-        <mat-label>Prénom</mat-label>
-        <input matInput formControlName="firstname" required>
-      </mat-form-field>
+
       
-      <!-- Champ pour le nom de famille -->
+<!-- ------------------------------------------------ NOM --------------------------------------------------- -->
+
       <mat-form-field style="width: 100%;">
         <mat-label>Nom</mat-label>
         <input matInput formControlName="lastname" required>
+        <mat-error *ngIf="signupForm.get('lastname')?.hasError('required')">
+          Le nom de famille est requis.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('lastname')?.hasError('maxlength')">
+          Le nom de famille ne doit pas dépasser 50 caractères.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('lastname')?.hasError('pattern')">
+          Ne doit contenir que des lettres, espaces, apostrophes ou tirets.
+        </mat-error>
       </mat-form-field>
       
-      <!-- Champ pour l'email -->
+<!-- ---------------------------------------------- PRENOM ------------------------------------------------- -->
+
       <mat-form-field style="width: 100%;">
+        <mat-label>Prénom</mat-label>
+        <input matInput formControlName="firstname" required>
+        <mat-error *ngIf="signupForm.get('firstname')?.hasError('required')">
+          Le prénom est requis.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('firstname')?.hasError('maxlength')">
+          Le prénom ne doit pas dépasser 50 caractères.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('firstname')?.hasError('pattern')">
+          Ne doit contenir que des lettres, espaces, apostrophes ou tirets.
+        </mat-error>
+      </mat-form-field>
+      
+
+<!-- ------------------------------------------------ EMAIL -------------------------------------------------- -->
+
+<mat-form-field style="width: 100%;">
         <mat-label>Email</mat-label>
         <input matInput formControlName="email" type="email" required>
+        <mat-error *ngIf="signupForm.get('email')?.hasError('required')">
+          L'adresse e-mail est requise.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('email')?.hasError('email')">
+          L'adresse e-mail doit être valide.
+        </mat-error>
       </mat-form-field>
+
       
-      <!-- Champ pour le mot de passe -->
-      <mat-form-field style="width: 100%;">
+<!-- -------------------------------------------- MOT DE PASSE ----------------------------------------------- -->
+
+<mat-form-field style="width: 100%;">
         <mat-label>Mot de passe</mat-label>
         <input matInput formControlName="password" type="password" required>
+        <mat-error *ngIf="signupForm.get('password')?.hasError('required')">
+          Le mot de passe est requis.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('password')?.hasError('minlength')">
+          Le mot de passe doit contenir au moins 8 caractères.
+        </mat-error>
+        <mat-error *ngIf="signupForm.get('password')?.hasError('pattern')">
+          Le mot de passe doit contenir au moins une majuscule et un caractère spécial.
+        </mat-error>
       </mat-form-field>
       
-      <!-- Champ pour le rôle -->
+
+<!-- -------------------------------------- REPETITION DU MOT DE PASSE --------------------------------------- -->
+
       <mat-form-field style="width: 100%;">
+        <mat-label>Répétez le mot de passe</mat-label>
+        <input matInput formControlName="confirmPassword" type="password" required>
+        <mat-error *ngIf="signupForm.get('confirmPassword')?.hasError('required')">
+          La confirmation du mot de passe est requise.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-error *ngIf="signupForm.hasError('passwordMismatch')">
+        Les mots de passe ne correspondent pas.
+      </mat-error>
+
+<!-- ------------------------------------------------- ROLE ---------------------------------------------------- -->
+
+<!-- <mat-form-field style="width: 100%;">
         <mat-label>Rôle</mat-label>
         <input matInput formControlName="role" required>
-      </mat-form-field>
+        <mat-error *ngIf="signupForm.get('role')?.hasError('required')">
+          Le rôle est requis.
+        </mat-error>
+      </mat-form-field> -->
       
-      <!-- Bouton de soumission -->
-      <button mat-raised-button color="primary" type="submit">S'inscrire</button>
+      <!-- Affichage du message d'erreur -->
+      <!-- <div *ngIf="errorMessage" style="color: red; margin-bottom: 10px;">
+        {{ errorMessage }}
+      </div> -->
+
+      <!-- Affichage du message d'erreur venant du backend -->
+      <div *ngIf="errorMessage" style="color: red; margin-top: 10px;">
+        {{ errorMessage }}
+      </div>
+
+<!-- ---------------------------------------------- SOUMISSION ------------------------------------------------- -->
+
+<button mat-raised-button class="submitButton" color="primary" type="submit">
+        S'inscrire
+      </button>
     </form>
   </mat-card>
 </div>
+

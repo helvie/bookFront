@@ -1,6 +1,7 @@
 export interface AuthResponse {
     token: string;
     refreshToken: string;
+    lastName: string;
   }
 
 export interface SignupResponse {

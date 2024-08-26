@@ -12,7 +12,6 @@ const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'request-reset-password', component: RequestResetPasswordComponent },
   { path: 'change-password', component: ChangePasswordComponent },
-  // Ajoutez d'autres routes liées à l'authentification si nécessaire
 ];
 
 @NgModule({

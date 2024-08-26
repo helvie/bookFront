@@ -1,0 +1,28 @@
+<div [formGroup]="formGroup"> 
+  <mat-form-field style="width: 100%;">
+    <mat-label>{{ label }}</mat-label>
+    <input matInput 
+           [formControlName]="controlName" 
+           [type]="type" 
+           [required]="required" 
+           [attr.minlength]="minLength" 
+           [attr.pattern]="pattern">
+    
+    <mat-error *ngIf="formGroup.get(controlName)?.hasError('required')">
+      {{ label }} est requis.
+    </mat-error>
+    
+    <mat-error *ngIf="formGroup.get(controlName)?.hasError('minlength')">
+      {{ label }} doit contenir au moins {{ minLength }} caractères.
+    </mat-error>
+    
+    <mat-error *ngIf="formGroup.get(controlName)?.hasError('pattern')">
+      {{ patternErrorMessage }}
+    </mat-error>
+
+    <mat-error *ngIf="formGroup.get(controlName)?.hasError('email')">
+      {{ emailErrorMessage }}
+    </mat-error>
+    
+  </mat-form-field>
+</div>

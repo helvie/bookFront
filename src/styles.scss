@@ -40,8 +40,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
-button {
+.submitButton {
     font-size:15px !important;
     font-weight:normal !important;
-
+    margin-top:40px;
 }

@@ -9,8 +9,8 @@ import { SignupComponent } from './views/signup/signup.component';
 import { ResetPasswordComponent } from './views/reset-password/reset-password.component';
 import { RequestResetPasswordComponent } from './views/request-reset-password/request-reset-password.component';
 import { ChangePasswordComponent } from './views/change-password/change-password.component';
-import { MaterialModule } from '../material.module';
 import { AuthenticationRoutingModule } from './authentication-routing.module';  
+import { SharedModule } from '../shared-module/shared-module.module';
 
 @NgModule({
   declarations: [
@@ -18,22 +18,21 @@ import { AuthenticationRoutingModule } from './authentication-routing.module';
     SignupComponent,
     ResetPasswordComponent,
     RequestResetPasswordComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
-    MaterialModule,
-    AuthenticationRoutingModule
+    AuthenticationRoutingModule,
+    SharedModule
   ],
   exports: [
     LoginComponent,
     SignupComponent,
     ResetPasswordComponent,
     RequestResetPasswordComponent,
-    ChangePasswordComponent
-  ]
+    ChangePasswordComponent  ]
 })
 export class AuthenticationModule { }
